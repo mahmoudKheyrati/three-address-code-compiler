@@ -16,6 +16,13 @@ test: build
 		echo "---------------------------------------------------" ; \
 	done
 
+build_lex: clean
+	flex -o ./build/lexer.c lexer.l
+	gcc -o ./build/a.out -lfl ./build/lexer.c
+
+run_lex: build_lex
+	./build/a.out
+
 clean:
 	rm -rf ./build/*;
 	rm -rf ./tests/output/*;
