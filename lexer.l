@@ -4,32 +4,24 @@
     void yyerror(char *s);
 %}
 
-digit [0-9]
-letter [a-zA-Z]
-ws [ \t\r\n]
-underscore _
-number [0-9]+(.[0-9]+)?
-
+number -?(([0-9]+)|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)
+id     [a-zA-Z_][a-zA-Z0-9_]*
+ws [ \t\r\n]+
 %%
 
-{number} {  yylval = atof(yytext);
-            printf("NUMBER %s, %d\n", yytext, yylval);
-            return NUMBER;
-         }
+{number} { yylval= yytext; return NUMBER; }
 
-:(A|S|M|D): {printf("operator - %s \n", yytext); }
-{letter}({letter}|{digit}|{underscore})* { printf("VARIABLE  %s\n", yytext);
-                 return VARIABLE;
-               }
+:A: {return '+';}
+:S: {return '-';}
+:M: {return '*';}
+:D: {return '/';}
+
+{id} { yylval= yytext; return ID; }
 
 
-[-+()=] {printf("fuck%s\n", yytext);return *yytext;}
-
-[ \t\r\n] {};
+[-+\(\)=] {return *yytext;}
 
 . { yyerror("invalid character"); }
-
-
 %%
 
 int yywrap(){
