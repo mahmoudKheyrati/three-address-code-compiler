@@ -1,6 +1,9 @@
 %{
+    #define YYSTYPE char*
+    #define YYSTYPE_IS_DECLARED 1
     #include <stdlib.h>
     #include "parser.h"
+    #include "string.h"
     void yyerror(char *s);
 %}
 
@@ -9,14 +12,15 @@ id     [a-zA-Z_][a-zA-Z0-9_]*
 ws [ \t\r\n]+
 %%
 
-{number} { yylval= yytext; return NUMBER; }
+{ws} {}
+{number} { char *val = malloc(yyleng+1); strcpy(val, yytext); yylval= val; return NUMBER; }
 
 :A: {return '+';}
 :S: {return '-';}
 :M: {return '*';}
 :D: {return '/';}
 
-{id} { yylval= yytext; return ID; }
+{id} { char *val = malloc(yyleng+1); strcpy(val, yytext); yylval= val; return ID; }
 
 
 [-+\(\)=] {return *yytext;}
