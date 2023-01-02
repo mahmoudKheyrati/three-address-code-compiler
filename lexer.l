@@ -25,7 +25,11 @@ ws [ \t\r\n]+
 
 [-+\(\)=] {return *yytext;}
 
-. { yyerror("invalid character"); }
+. {
+    char* error = malloc(100);
+    sprintf(error, "invalid character %s", yytext);
+    yyerror(error);
+ }
 %%
 
 int yywrap(){
