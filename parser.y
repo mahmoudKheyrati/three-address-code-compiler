@@ -15,6 +15,7 @@
 %right  '*' '/'
 
 %%
+///////////////////////// version 1 /////////////////////////
 //program: ID '=' expr { printf("Result: %s = %s", $1, $3); }
 //	;
 //expr: expr '+' term { $$ = malloc(100); sprintf($$,"%s + %s", $3, $1); }
@@ -29,21 +30,38 @@
 //	| NUMBER { $$ = malloc(100); sprintf($$,"%s", $1); }
 //	| ID { $$ = malloc(100); sprintf($$,"%s", $1); }
 //	;
-program: ID '=' expr { printf("%s = %s", $1, $3); }
-	;
-expr: expr '+' term { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s + %s\n", registerNumber, $3, $1); registerNumber++; }
-	| expr '-' term { $$= malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s - %s\n", registerNumber, $3, $1); registerNumber++; }
-	| term { $$ = $1; }
-	;
-term: term '*' factor { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s * %s\n", registerNumber, $3, $1); registerNumber++; }
-	| term '/' factor { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s / %s\n", registerNumber, $3, $1); registerNumber++; }
-	| factor { $$ = $1; }
-	;
-factor: '(' expr ')' { $$ = malloc(100); sprintf($$,"%s", $2); }
-	| NUMBER { $$ = malloc(100); sprintf($$,"%s", $1); }
-	| ID { $$ = malloc(100); sprintf($$,"%s", $1); }
-	;
 
+//////////////////////// version 2: generate three address code ////////////////////////
+//program: ID '=' expr { printf("%s = %s", $1, $3); }
+//	;
+//expr: expr '+' term { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s + %s\n", registerNumber, $3, $1); registerNumber++; }
+//	| expr '-' term { $$= malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s - %s\n", registerNumber, $3, $1); registerNumber++; }
+//	| term { $$ = $1; }
+//	;
+//term: term '*' factor { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s * %s\n", registerNumber, $3, $1); registerNumber++; }
+//	| term '/' factor { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s / %s\n", registerNumber, $3, $1); registerNumber++; }
+//	| factor { $$ = $1; }
+//	;
+//factor: '(' expr ')' { $$ = malloc(100); sprintf($$,"%s", $2); }
+//	| NUMBER { $$ = malloc(100); sprintf($$,"%s", $1); }
+//	| ID { $$ = malloc(100); sprintf($$,"%s", $1); }
+//	;
+//////////////////////// version 3: remove last redundant register ////////////////////////
+program: ID '=' expr '+' expr { printf("x = %s + %s;", $5, $3); }
+| ID '=' expr '-' expr { printf("x = %s - %s;", $5, $3); }
+| ID '=' expr '*' expr { printf("x = %s * %s;", $5, $3); }
+| ID '=' expr '/' expr { printf("x = %s / %s;", $5, $3); }
+| ID '=' '(' expr ')' { printf("x = %s;", $4); }
+| NUMBER
+| ID
+;
+expr: expr '+' expr { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s + %s;\n", registerNumber, $3, $1); registerNumber++; }
+| expr '-' expr { $$= malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s - %s;\n", registerNumber, $3, $1); registerNumber++; }
+| expr '*' expr { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s * %s;\n", registerNumber, $3, $1); registerNumber++; }
+| expr '/' expr { $$ = malloc(100); sprintf($$,"t%d", registerNumber); printf("t%d = %s / %s;\n", registerNumber, $3, $1); registerNumber++; }
+| '(' expr ')' { $$ = malloc(100); sprintf($$,"%s", $2); }
+| NUMBER { $$ = malloc(100); sprintf($$,"%s", $1); }
+| ID { $$ = malloc(100); sprintf($$,"%s", $1); }
 
 %%
 
